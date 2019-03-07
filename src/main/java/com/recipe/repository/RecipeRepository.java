@@ -1,7 +1,9 @@
-package guru.springframework.repositories;
+package com.recipe.repository;
 
-import guru.springframework.models.Recipe;
 import org.springframework.data.repository.CrudRepository;
 
+import com.recipe.domain.Recipe;
+
 public interface RecipeRepository extends CrudRepository<Recipe, Long> {
+	
 }

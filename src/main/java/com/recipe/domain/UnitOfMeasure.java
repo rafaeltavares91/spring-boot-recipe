@@ -1,4 +1,4 @@
-package guru.springframework.models;
+package com.recipe.domain;
 
 import lombok.*;
 
