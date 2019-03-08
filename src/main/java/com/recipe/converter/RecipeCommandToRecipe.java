@@ -1,58 +1,66 @@
 package com.recipe.converter;
 
-import org.springframework.core.convert.converter.Converter;
-import org.springframework.lang.Nullable;
 import org.springframework.stereotype.Component;
 
+import com.fasterxml.jackson.databind.JavaType;
+import com.fasterxml.jackson.databind.type.TypeFactory;
+import com.fasterxml.jackson.databind.util.Converter;
 import com.recipe.command.RecipeCommand;
 import com.recipe.domain.Recipe;
-
-import lombok.Synchronized;
 
 @Component
 public class RecipeCommandToRecipe implements Converter<RecipeCommand, Recipe> {
 
-	private final NotesCommandToNotes notesCommandToNotes;
-	private final CategoryCommandToCategory categoryCommandToCategory;
-	private final IngredientCommandToIngredient ingredientCommandToIngredient;
+	private final CategoryCommandToCategory categoryConveter;
+	private final IngredientCommandToIngredient ingredientConverter;
+	private final NotesCommandToNotes notesConverter;
 
-	public RecipeCommandToRecipe(NotesCommandToNotes notesCommandToNotes,
-			CategoryCommandToCategory categoryCommandToCategory,
-			IngredientCommandToIngredient ingredientCommandToIngredient) {
-		this.notesCommandToNotes = notesCommandToNotes;
-		this.categoryCommandToCategory = categoryCommandToCategory;
-		this.ingredientCommandToIngredient = ingredientCommandToIngredient;
+	public RecipeCommandToRecipe(CategoryCommandToCategory categoryConveter,
+			IngredientCommandToIngredient ingredientConverter, NotesCommandToNotes notesConverter) {
+
+		this.categoryConveter = categoryConveter;
+		this.ingredientConverter = ingredientConverter;
+		this.notesConverter = notesConverter;
 	}
 
-	@Synchronized
-	@Nullable
 	@Override
-	public Recipe convert(RecipeCommand recipeCommand) {
-		if (recipeCommand == null) {
+	public Recipe convert(RecipeCommand source) {
+		if (source == null) {
 			return null;
 		}
 
-		Recipe recipe = new Recipe();
-		recipe.setId(recipeCommand.getId());
-		recipe.setDescription(recipeCommand.getDescription());
-		recipe.setPrepTime(recipeCommand.getPrepTime());
-		recipe.setCookTime(recipeCommand.getCookTime());
-		recipe.setServings(recipeCommand.getServings());
-		recipe.setSource(recipeCommand.getSource());
-		recipe.setUrl(recipeCommand.getUrl());
-		recipe.setDirections(recipeCommand.getDirections());
-		recipe.setImage(recipeCommand.getImage());
-		recipe.setDifficulty(recipeCommand.getDifficulty());
-		recipe.setNotes(notesCommandToNotes.convert(recipeCommand.getNotesCommand()));
-		if (recipeCommand.getCategories() != null && recipeCommand.getCategories().size() > 0) {
-			recipeCommand.getCategories()
-					.forEach(category -> recipe.getCategories().add(categoryCommandToCategory.convert(category)));
+		final Recipe recipe = new Recipe();
+		recipe.setId(source.getId());
+		recipe.setCookTime(source.getCookTime());
+		recipe.setPrepTime(source.getPrepTime());
+		recipe.setDescription(source.getDescription());
+		recipe.setDifficulty(source.getDifficulty());
+		recipe.setDirections(source.getDirections());
+		recipe.setServings(source.getServings());
+		recipe.setSource(source.getSource());
+		recipe.setUrl(source.getUrl());
+		recipe.setNotes(notesConverter.convert(source.getNotes()));
+		if (source.getCategories() != null && source.getCategories().size() > 0) {
+			source.getCategories().forEach(category -> recipe.getCategories().add(categoryConveter.convert(category)));
 		}
-		if (recipeCommand.getIngredients() != null && recipeCommand.getIngredients().size() > 0) {
-			recipeCommand.getIngredients().forEach(
-					ingredient -> recipe.getIngredients().add(ingredientCommandToIngredient.convert(ingredient)));
+
+		if (source.getIngredients() != null && source.getIngredients().size() > 0) {
+			source.getIngredients()
+					.forEach(ingredient -> recipe.getIngredients().add(ingredientConverter.convert(ingredient)));
 		}
 		return recipe;
 	}
-	
+
+	@Override
+	public JavaType getInputType(TypeFactory typeFactory) {
+		System.out.println("unimplemented " + Object.class.getName() + "  " + Object.class.getClass().getMethods());
+		return null;
+	}
+
+	@Override
+	public JavaType getOutputType(TypeFactory typeFactory) {
+		System.out.println("unimplemented " + Object.class.getName() + "  " + Object.class.getClass().getMethods());
+		return null;
+	}
+
 }

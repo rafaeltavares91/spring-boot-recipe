@@ -1,29 +1,42 @@
 package com.recipe.converter;
 
-import org.springframework.core.convert.converter.Converter;
+import lombok.Synchronized;
+
 import org.springframework.lang.Nullable;
 import org.springframework.stereotype.Component;
 
+import com.fasterxml.jackson.databind.JavaType;
+import com.fasterxml.jackson.databind.type.TypeFactory;
+import com.fasterxml.jackson.databind.util.Converter;
 import com.recipe.command.CategoryCommand;
 import com.recipe.domain.Category;
 
-import lombok.Synchronized;
-
 @Component
 public class CategoryToCategoryCommand implements Converter<Category, CategoryCommand> {
-
+	
 	@Synchronized
 	@Nullable
 	@Override
-	public CategoryCommand convert(Category category) {
-		if (category == null) {
+	public CategoryCommand convert(Category source) {
+		if (source == null) {
 			return null;
 		}
 
-		CategoryCommand categoryCommand = new CategoryCommand();
-		categoryCommand.setId(category.getId());
-		categoryCommand.setDescription(category.getDescription());
+		final CategoryCommand categoryCommand = new CategoryCommand();
+		categoryCommand.setId(source.getId());
+		categoryCommand.setDescription(source.getDescription());
 		return categoryCommand;
 	}
-	
+
+	@Override
+	public JavaType getInputType(TypeFactory typeFactory) {
+		// TODO Auto-generated method stub
+		return null;
+	}
+
+	@Override
+	public JavaType getOutputType(TypeFactory typeFactory) {
+		// TODO Auto-generated method stub
+		return null;
+	}
 }
